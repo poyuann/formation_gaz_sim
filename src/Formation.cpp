@@ -31,6 +31,7 @@ void Formation::setFormationMap(std::vector<std::vector<double>> FM)
         {
             relative_Map[i][j](0) = formationMap[i][0] - formationMap[j][0];
             relative_Map[i][j](1) = formationMap[i][1] - formationMap[j][1];
+            relative_Map[i][j](2) = formationMap[i][2] - formationMap[j][2];
         }
     }
 }
@@ -57,15 +58,14 @@ Eigen::Vector3d Formation::computeDesiredLVelocity(double dt)
         {
             desiredVel(0) += 0.3*(Mavs_eigen[i].r(0) - Mavs_eigen[ID].r(0) + relative_Map[ID][i](0));
             desiredVel(1) += 0.3*(Mavs_eigen[i].r(1) - Mavs_eigen[ID].r(1) + relative_Map[ID][i](1));
-            //desiredVel(2) += (Mavs_eigen[i].r(2) - Mavs_eigen[ID].r(2));
+            desiredVel(2) += 0.3*(Mavs_eigen[i].r(2) - Mavs_eigen[ID].r(2) + relative_Map[ID][i](2));
         
             virtualAcc += (Mavs_eigen[i].v - Mavs_eigen[ID].v);
         }
     }
     desiredVel(0) += (Mavs_eigen[0].r(0) - Mavs_eigen[ID].r(0) + relative_Map[ID][0](0));
     desiredVel(1) += (Mavs_eigen[0].r(1) - Mavs_eigen[ID].r(1) + relative_Map[ID][0](1));
-    desiredVel(2) += (Mavs_eigen[0].r(2) - Mavs_eigen[ID].r(2));
-    desiredVel(2) += 2.5;
+    desiredVel(2) += (Mavs_eigen[0].r(2) - Mavs_eigen[ID].r(2) + relative_Map[ID][0](2) );
 
     virtualAcc += 5*(Mavs_eigen[0].v - Mavs_eigen[ID].v);
     // desiredVel(0) += Mavs_eigen[0].v(0);

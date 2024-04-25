@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/CommandTOL.h>
@@ -32,6 +33,7 @@ int main(int argc, char **argv)
 
     // publisher
     ros::Publisher desired_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("mavros/setpoint_position/local", 10);
+    ros::Publisher vel_cmd_pub = nh.advertise<geometry_msgs::TwistStamped>("mavros/setpoint_velocity/cmd_vel", 10);
 
     // service
     ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
@@ -78,6 +80,10 @@ int main(int argc, char **argv)
     desired_pose.pose.position.y = 0;
     desired_pose.pose.position.z = 0;
 
+    geometry_msgs::TwistStamped desired_vel;
+    desired_vel.twist.linear.x = 0;
+    desired_vel.twist.linear.y = 0;
+    desired_vel.twist.linear.z = 0;    
     //send a few setpoints before starting
     for(int i = 100; ros::ok() && i > 0; --i){
         desired_pose_pub.publish(desired_pose);
@@ -176,9 +182,20 @@ int main(int argc, char **argv)
             trajectory_time += 0.01;
             desired_pose.pose.position.x = current_x + 2*cos(trajectory_time);
             desired_pose.pose.position.y = current_y + 2*sin(trajectory_time);
+            
+            desired_vel.twist.linear.x = 0.5*(desired_pose.pose.position.x - current_x);
+            desired_vel.twist.linear.y = 0.5*(desired_pose.pose.position.y - current_y);     
+            desired_vel.twist.linear.z = 0.5*(desired_pose.pose.position.z - 8); 
+
+            // vel_cmd_pub.publish(desired_vel);
         }
+        // else
+        // {
+        //     desired_pose_pub.publish(desired_pose);
+        // }
 
         desired_pose_pub.publish(desired_pose);
+        // vel_cmd_pub.publish(desired_vel);
         ros::spinOnce();
         rate.sleep();
     }

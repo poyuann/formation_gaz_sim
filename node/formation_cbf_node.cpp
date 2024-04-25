@@ -127,8 +127,8 @@ public:
     bool estimating;
     Target_EST_FeedBack(ros::NodeHandle& nh_)
     {   
-        target_pose_sub = nh_.subscribe<geometry_msgs::PoseStamped>("THEIF/pose", 10, &Target_EST_FeedBack::est_pose_cb, this);
-        target_twist_sub = nh_.subscribe<geometry_msgs::TwistStamped>("THEIF/twist", 10, &Target_EST_FeedBack::est_twist_cb, this);
+        target_pose_sub = nh_.subscribe<geometry_msgs::PoseStamped>("/leader/formation/pose", 10, &Target_EST_FeedBack::est_pose_cb, this);
+        target_twist_sub = nh_.subscribe<geometry_msgs::TwistStamped>("/leader/formation/twist", 10, &Target_EST_FeedBack::est_twist_cb, this);
         isTargetEst_sub = nh_.subscribe<std_msgs::Bool>("THEIF/isTargetEst", 10, &Target_EST_FeedBack::isTargetEst_cb, this);
     }
     void est_pose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){target_est_pose = msg->pose;}
@@ -149,13 +149,14 @@ int main(int argc, char **argv)
 
     std::string vehicle;
     ros::param::get("vehicle", vehicle);
-
+    vehicle = "iris";
     ros::Publisher vel_cmd_pub = nh.advertise<geometry_msgs::TwistStamped>("mavros/setpoint_velocity/cmd_vel", 10);
 
-    MAV mavs[]={MAV(nh, "target", 0),
-                MAV(nh, vehicle, 1),
-                MAV(nh, vehicle, 2),
-                MAV(nh, vehicle, 3)};
+    MAV mavs[]={MAV(nh, "target", 0, 0),
+                MAV(nh, vehicle, 1, 0),
+                MAV(nh, vehicle, 2, 0),
+                MAV(nh, vehicle, 3, 0)};
+    string prefix = string("/") + vehicle + string("_") + to_string(1);
     int mavNum = sizeof(mavs)/sizeof(mavs[0]);
     int ID;
     std::vector<MAV_eigen> Mavs_eigen(mavNum);
@@ -175,9 +176,9 @@ int main(int argc, char **argv)
                                                 {1, 1, 1, 1},
                                                 {1, 1, 1, 1}};
     std::vector<std::vector<double>> formationMap{{0, 0},
-                                                {0, d},
-                                                {double(sqrt(3))*d/2, -d/2},
-                                                {double(-sqrt(3))*d/2, -d/2}};
+                                                {0, d, 2},
+                                                {double(sqrt(3))*d/2, -d/2 , -3},
+                                                {double(-sqrt(3))*d/2, -d/2, 2}};
     formation.setLaplacianMap(laplacianMap);
     formation.setFormationMap(formationMap);
 
@@ -191,12 +192,12 @@ int main(int argc, char **argv)
         rate.sleep();
         ROS_INFO("UAV_%i waiting for FCU", ID);
     }
-    while (ros::ok() && !mavs[ID].pose_init)
-    {
-        ros::spinOnce();
-        rate.sleep();
-        ROS_INFO("UAV_%i waiting for position estimation", ID);
-    }
+    // while (ros::ok() && !mavs[ID].pose_init)
+    // {
+    //     ros::spinOnce();
+    //     rate.sleep();
+    //     ROS_INFO("UAV_%i waiting for position estimation", ID);
+    // }
     
     Eigen::Vector3d formation_vel;
     Eigen::VectorXd final_vel;
@@ -212,10 +213,16 @@ int main(int argc, char **argv)
         std::cout << "[UAV_" << ID << "]:\n";
         std::cout << "Armed: " << armed << "\n";
         std::cout << "Mode: " << mavs[ID].getState().mode << "\n";
+        // if(!ifget)
+        std::cout<<vehicle+"fail \n";
 
-        if(cmd.vision_tracking)
+        for (int i=0;i<4;i++)
+        cout <<"i = "<<i<< mavs[i].getPose() << "\n";
+        if(true)
+        // if(cmd.vision_tracking)
         {
-            if(target.estimating)
+            if(true)
+            // if(target.estimating)
             {
                 std::cout << "Vision tracking mode\n\n";
                 mavs[0].setPose(target.getPose());
@@ -281,5 +288,3 @@ int main(int argc, char **argv)
     }
 
 }
-
-

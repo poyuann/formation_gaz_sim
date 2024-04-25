@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 
 <launch>
-        <arg name="vehicle" default="typhoon_h480"/>
-
+        <arg name="vehicle" default="iris"/>
+        <param name="param1" value="iris"/>
         <group ns="$(arg vehicle)_1">
                 <node name="formation_cbf" pkg="formation_ctrl" type="formation_cbf" output="screen"></node>
                 <node name="gps_init_py" pkg="formation_ctrl" type="gps_init.py" output="screen"></node>
