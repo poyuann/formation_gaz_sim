@@ -136,8 +136,8 @@ bool Velocity_cbf::computeCBF(Eigen::Vector3d formation_vel, Eigen::Vector3d ang
 
     lowerBound.segment(0, neighbor_num) = B_uCA_l;
     lowerBound(neighbor_num) = B_tCA_l;
-    lowerBound(neighbor_num+1) = B_HF_l;
-    lowerBound(neighbor_num+2) = B_VF_l;
+    // lowerBound(neighbor_num+1) = B_HF_l;
+    // lowerBound(neighbor_num+2) = B_VF_l;
     
     solver.data()->clearHessianMatrix();
     solver.data()->clearLinearConstraintsMatrix();

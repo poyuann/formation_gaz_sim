@@ -2,6 +2,6 @@
 <launch>
 	<group ns="target">
                 <node name="keyboard_ctrl" pkg="formation_ctrl" type="keyboard_ctrl" output="screen"/>
-                <node name="gps_init_py" pkg="formation_ctrl" type="gps_init.py" output="screen"></node>
+                <!-- <node name="gps_init_py" pkg="formation_ctrl" type="gps_init.py" output="screen"></node> -->
         </group>
 </launch>

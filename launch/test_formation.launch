@@ -4,9 +4,9 @@
     <!-- launches Gazebo environment and 2x: MAVROS, PX4 SITL, and spawns vehicle -->
     <!-- vehicle model and world -->
     <arg name="est" default="ekf2"/>
-    <arg name="vehicle" default="iris"/>
-    <arg name="name" default="iris"/>    
-    <arg name="world" default="$(find mavlink_sitl_gazebo)/worlds/empty.world"/>
+    <arg name="vehicle" default="typhoon_h480"/>
+    <arg name="name" default="typhoon_h480"/>    
+    <arg name="world" default="$(find mavlink_sitl_gazebo)/worlds/typhoon_h480.world"/>
     <!-- gazebo configs -->
     <arg name="gui" default="true"/>
     <arg name="debug" default="false"/>
@@ -34,7 +34,7 @@
             <arg name="P" value="0"/>
             <arg name="Y" value="0"/>
             <!-- <arg name="name" value="target"/> -->
-            <arg name="vehicle" value="$(arg vehicle)"/>
+            <arg name="vehicle" value="iris"/>
             <arg name="mavlink_udp_port" value="14560"/>
             <arg name="mavlink_tcp_port" value="4560"/>
             <arg name="ID" value="$(arg ID)"/>
@@ -51,7 +51,7 @@
         </include>
     </group>
     <!-- UAV1 -->
-    <group ns="$(arg name)_1">
+    <group ns="$(arg name)1">
         <!-- MAVROS and vehicle configs -->
         <arg name="ID" value="1"/>
         <arg name="fcu_url" default="udp://:14541@localhost:14581"/>
@@ -81,7 +81,7 @@
         </include>
     </group>
     <!-- UAV2 -->
-    <group ns="$(arg name)_2">
+    <group ns="$(arg name)2">
         <!-- MAVROS and vehicle configs -->
         <arg name="ID" value="2"/>
         <arg name="fcu_url" default="udp://:14542@localhost:14582"/>
@@ -111,7 +111,7 @@
         </include>
     </group>
     <!-- UAV3 -->
-    <group ns="$(arg name)_3">
+    <group ns="$(arg name)3">
         <!-- MAVROS and vehicle configs -->
         <arg name="ID" value="3"/>
         <arg name="fcu_url" default="udp://:14543@localhost:14583"/>

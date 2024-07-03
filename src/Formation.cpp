@@ -52,13 +52,14 @@ Eigen::Vector3d Formation::computeDesiredLVelocity(double dt)
     desiredVel.setZero();
     desiredVel += virtualAcc*dt;
     virtualAcc.setZero();
+    
     for(int i=1; i<mav_num; i++)
     {
         if(laplacianMap[ID][i])
         {
-            desiredVel(0) += 0.3*(Mavs_eigen[i].r(0) - Mavs_eigen[ID].r(0) + relative_Map[ID][i](0));
-            desiredVel(1) += 0.3*(Mavs_eigen[i].r(1) - Mavs_eigen[ID].r(1) + relative_Map[ID][i](1));
-            desiredVel(2) += 0.3*(Mavs_eigen[i].r(2) - Mavs_eigen[ID].r(2) + relative_Map[ID][i](2));
+            desiredVel(0) += 0.8*(Mavs_eigen[i].r(0) - Mavs_eigen[ID].r(0) + relative_Map[ID][i](0));
+            desiredVel(1) += 0.8*(Mavs_eigen[i].r(1) - Mavs_eigen[ID].r(1) + relative_Map[ID][i](1));
+            desiredVel(2) += 0.8*(Mavs_eigen[i].r(2) - Mavs_eigen[ID].r(2) + relative_Map[ID][i](2));
         
             virtualAcc += (Mavs_eigen[i].v - Mavs_eigen[ID].v);
         }
@@ -67,7 +68,7 @@ Eigen::Vector3d Formation::computeDesiredLVelocity(double dt)
     desiredVel(1) += (Mavs_eigen[0].r(1) - Mavs_eigen[ID].r(1) + relative_Map[ID][0](1));
     desiredVel(2) += (Mavs_eigen[0].r(2) - Mavs_eigen[ID].r(2) + relative_Map[ID][0](2) );
 
-    virtualAcc += 5*(Mavs_eigen[0].v - Mavs_eigen[ID].v);
+    virtualAcc += 5*(Mavs_eigen[0].v );
     // desiredVel(0) += Mavs_eigen[0].v(0);
     // desiredVel(1) += Mavs_eigen[0].v(1);
     
@@ -75,9 +76,14 @@ Eigen::Vector3d Formation::computeDesiredLVelocity(double dt)
 }
 
 double Formation::computeDesiredYawVelocity()
-{
+{   
     desired_yaw = atan2(Mavs_eigen[0].r(1) - Mavs_eigen[ID].r(1), Mavs_eigen[0].r(0) - Mavs_eigen[ID].r(0));
-    
+
+    // desired_yaw =  2.1718;//atan2(Mavs_eigen[0].r(1) - Mavs_eigen[ID].r(1), Mavs_eigen[0].r(0) - Mavs_eigen[ID].r(0));
+    // if (ID == 1)
+    //     desired_yaw =    -0.9690;
+    // if (ID == 2)
+    //     desired_yaw =     0.7868;   
     double error_yaw = desired_yaw - yaw;
     if(error_yaw>M_PI)
         error_yaw = error_yaw - 2*M_PI;

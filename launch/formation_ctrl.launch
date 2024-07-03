@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 
 <launch>
-        <arg name="vehicle" default="iris"/>
-        <param name="param1" value="iris"/>
-        <group ns="$(arg vehicle)_1">
+        <arg name="vehicle" default="typhoon_h480"/>
+        <param name="param1" value="typhoon_h480"/>
+        <group ns="$(arg vehicle)1">
                 <node name="formation_cbf" pkg="formation_ctrl" type="formation_cbf" output="screen"></node>
                 <node name="gps_init_py" pkg="formation_ctrl" type="gps_init.py" output="screen"></node>
                 <param name="mav_id" value="1" />
         </group>
-        <group ns="$(arg vehicle)_2">
+        <group ns="$(arg vehicle)2">
                 <node name="formation_cbf" pkg="formation_ctrl" type="formation_cbf"></node>
                 <node name="gps_init_py" pkg="formation_ctrl" type="gps_init.py" output="screen"></node>
                 <param name="mav_id" value="2" /> 
         </group>
-        <group ns="$(arg vehicle)_3">
+        <group ns="$(arg vehicle)3">
                 <node name="formation_cbf" pkg="formation_ctrl" type="formation_cbf"></node>
                 <node name="gps_init_py" pkg="formation_ctrl" type="gps_init.py" output="screen"></node>
                 <param name="mav_id" value="3" /> 

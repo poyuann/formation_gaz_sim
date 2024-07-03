@@ -161,7 +161,14 @@ target_link_libraries(formation_cbf
   )
 target_include_directories(formation_cbf PRIVATE
   include/${PROJECT_NAME}/)
-
+#for yolo
+add_executable(foryolo 
+  node/gpscontrl.cpp
+  src/getch.cpp )
+target_link_libraries(foryolo
+  ${catkin_LIBRARIES} )
+target_include_directories(foryolo PRIVATE
+  include/${PROJECT_NAME}/ )    
 # keyboard_ctrl
 add_executable(keyboard_ctrl 
   node/keyboard_ctrl_node.cpp

@@ -127,8 +127,8 @@ public:
     bool estimating;
     Target_EST_FeedBack(ros::NodeHandle& nh_)
     {   
-        target_pose_sub = nh_.subscribe<geometry_msgs::PoseStamped>("/leader/formation/pose", 10, &Target_EST_FeedBack::est_pose_cb, this);
-        target_twist_sub = nh_.subscribe<geometry_msgs::TwistStamped>("/leader/formation/twist", 10, &Target_EST_FeedBack::est_twist_cb, this);
+        target_pose_sub = nh_.subscribe<geometry_msgs::PoseStamped>("/typhoon_h480/THEIF/pose", 10, &Target_EST_FeedBack::est_pose_cb, this);
+        target_twist_sub = nh_.subscribe<geometry_msgs::TwistStamped>("/typhoon_h480/THEIF/twist", 10, &Target_EST_FeedBack::est_twist_cb, this);
         isTargetEst_sub = nh_.subscribe<std_msgs::Bool>("THEIF/isTargetEst", 10, &Target_EST_FeedBack::isTargetEst_cb, this);
     }
     void est_pose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){target_est_pose = msg->pose;}
@@ -149,14 +149,13 @@ int main(int argc, char **argv)
 
     std::string vehicle;
     ros::param::get("vehicle", vehicle);
-    vehicle = "iris";
+    // vehicle = "typhoon_h480";
     ros::Publisher vel_cmd_pub = nh.advertise<geometry_msgs::TwistStamped>("mavros/setpoint_velocity/cmd_vel", 10);
-
-    MAV mavs[]={MAV(nh, "target", 0, 0),
-                MAV(nh, vehicle, 1, 0),
-                MAV(nh, vehicle, 2, 0),
-                MAV(nh, vehicle, 3, 0)};
-    string prefix = string("/") + vehicle + string("_") + to_string(1);
+  
+    MAV mavs[]={MAV(nh, "target", 0 ,0),
+                MAV(nh, vehicle, 1 ,0) ,
+                MAV(nh, vehicle, 2 ,0),
+                MAV(nh, vehicle, 3 ,0)};
     int mavNum = sizeof(mavs)/sizeof(mavs[0]);
     int ID;
     std::vector<MAV_eigen> Mavs_eigen(mavNum);
@@ -175,10 +174,29 @@ int main(int argc, char **argv)
                                                 {1, 1, 1, 1},
                                                 {1, 1, 1, 1},
                                                 {1, 1, 1, 1}};
-    std::vector<std::vector<double>> formationMap{{0, 0},
+    // std::vector<std::vector<double>> formationMap{{0, 0, 10},
+    //                                             { 1.3580,    -1.2072,  13.5635},
+    //                                             { -0.7669, 1.7305 , 13.5238},
+    //                                             { -2.3468, -3.0174, 8.8218}};  //best but target error sometimes
+
+    std::vector<std::vector<double>> formationMap{{0, 0, 0},
                                                 {0, d, 2},
-                                                {double(sqrt(3))*d/2, -d/2 , -3},
-                                                {double(-sqrt(3))*d/2, -d/2, 2}};
+                                                {double(sqrt(3))*d/2, -d/2, 2},
+                                                {double(-sqrt(3))*d/2, -d/2, 2 }};
+    // std::vector<std::vector<double>> formationMap{{0, 0, 10},
+    //                                             {3.8620 ,1.0416,10},
+    //                                             {-3.4304, -2.0573,10},
+    //                                             {2.0469, 3.4366,10}}; // worst 
+    // std::vector<std::vector<double>> formationMap{{0, 0, 10},
+    //                                             {     -0.3401,    -0.3743,   7.0429},
+    //                                             {   -1.9794,   -2.0221 , 10.9967},
+    //                                             { 1.0366,     0.9942,  12.6338 }};  //best but target error sometimes
+    // std::vector<std::vector<double>> formationMap{{0, 0, 10},
+    //                                             { 1.5070,   -2.1943,  8.6165},
+    //                                             {  0.3882,   2.6335, 8.6165},
+    //                                             {  2.5952,   0.6014,   8.6205 }}; 
+     std::vector<std::vector<double>> tempMap = formationMap;
+
     formation.setLaplacianMap(laplacianMap);
     formation.setFormationMap(formationMap);
 
@@ -207,19 +225,25 @@ int main(int argc, char **argv)
     double dt = 0.001;
 	double last_t = ros::Time::now().toSec();
 
+    double t_time=0;
     while (ros::ok()) 
     {
         bool armed = mavs[ID].getState().armed;
-        std::cout << "[UAV_" << ID << "]:\n";
-        std::cout << "Armed: " << armed << "\n";
-        std::cout << "Mode: " << mavs[ID].getState().mode << "\n";
-        // if(!ifget)
-        std::cout<<vehicle+"fail \n";
-
+        // std::cout << "[UAV_" << ID << "]:\n";
+        // std::cout << "Armed: " << armed << "\n";
+        // std::cout << "Mode: " << mavs[ID].getState().mode << "\n";
+        // t_time += 0.01;
+        // for(int i=1; i < formationMap.size(); i++)
+        // {
+        //     tempMap[i][0] = formationMap[i][0] *cos(t_time) + formationMap[i][1]*sin(t_time);
+        //     tempMap[i][1] = -formationMap[i][0] * sin(t_time) + formationMap[i][1] *cos(t_time);            
+        // }
+        // formation.setFormationMap(tempMap);
         for (int i=0;i<4;i++)
-        cout <<"i = "<<i<< mavs[i].getPose() << "\n";
-        if(true)
-        // if(cmd.vision_tracking)
+            cout <<"i = "<<i<< mavs[i].getPose() << "\n";
+            // cout << "i = " <<i<< tempMap[1][i]<<"\n\n";
+        std:: cout <<"mode :  "<<cmd.mode_CMD() <<"\n";
+        if(cmd.mode_CMD() == 5)
         {
             if(true)
             // if(target.estimating)
@@ -282,7 +306,7 @@ int main(int argc, char **argv)
 
         dt = ros::Time::now().toSec() - last_t;
     	last_t = ros::Time::now().toSec();
-
+      
         rate.sleep();
         ros::spinOnce();
     }
