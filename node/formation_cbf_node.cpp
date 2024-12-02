@@ -15,7 +15,7 @@
 #include "state_estimation/Mav.h"
 #include "Formation.h"
 #include "Velocity_cbf.h"
-#include <state_estimation/Plot.h>
+// #include <state_estimation/Plot.h>
 
 class CMD
 {
@@ -149,7 +149,6 @@ int main(int argc, char **argv)
 
     std::string vehicle;
     ros::param::get("vehicle", vehicle);
-    // vehicle = "typhoon_h480";
     ros::Publisher vel_cmd_pub = nh.advertise<geometry_msgs::TwistStamped>("mavros/setpoint_velocity/cmd_vel", 10);
   
     MAV mavs[]={MAV(nh, "target", 0 ,0),
@@ -166,7 +165,7 @@ int main(int argc, char **argv)
     Target_EST_FeedBack target(nh);
     Formation formation(mavNum);
     Velocity_cbf CBF(mavNum);
-    double d = 4.0;
+    double d = 3.0;
     double gamma = 1.2;
     double safe_Distance = 3;
 
@@ -177,26 +176,44 @@ int main(int argc, char **argv)
     // std::vector<std::vector<double>> formationMap{{0, 0, 10},
     //                                             { 1.3580,    -1.2072,  13.5635},
     //                                             { -0.7669, 1.7305 , 13.5238},
-    //                                             { -2.3468, -3.0174, 8.8218}};  //best but target error sometimes
+    //                                             { -2.3468, -3.0174, 8.8218}};  //best but target error sometimes lidar
 
+    // std::vector<std::vector<double>> formationMap{{0, 0, 0},
+    //                                             { 3.30614689,  1.30160112 , 3.51784412},
+    //                                             { 0.56290616,  1.79564649 , 4.63236336},
+    //                                             { 1.69215895, -0.9835283 ,  4.60100752}};
+    // std::vector<std::vector<double>> formationMap{{0, 0, 0},
+    //                                             {4.44976, 0.306942, 2.25952},
+    //                                             {1.04937, -0.0140828, 4.88862},
+    //                                             {-4.17454, 0.211045, 2.74384}
+    //                                             };                             // worst camera
+    // std::vector<std::vector<double>> formationMap{{0, 0, 0},
+    //                                             {-0.937938, -2.75732, 4.06417},
+    //                                             {-3.10855, -0.697186, 3.85368},
+    //                                             {2.11253, -4.50434, 0.498131}
+    //                                             };                             //test worst
+    // std::vector<std::vector<double>> formationMap{{0, 0, 0},
+    //                                             { 1.77516454e+00 , 4.67426902e+00 , 9.76934257e-06},
+    //                                             {-4.93561781e+00 ,-7.99798015e-01 , 8.98211992e-06},
+    //                                             { 3.16045033e+00 ,-3.87447464e+00 , 2.38316044e-05}};                             //nei worst
+    // std::vector<std::vector<double>> formationMap{{0, 0, 0},
+    //                                         {-3.89788, -2.3502, 2.06956}, 
+    //                                         {3.21168, -2.32042, 3.04971}, 
+    //                                         {-0.435081, 4.87361, 1.0289}
+    //                                         };                             // test optimal
     std::vector<std::vector<double>> formationMap{{0, 0, 0},
-                                                {0, d, 2},
-                                                {double(sqrt(3))*d/2, -d/2, 2},
-                                                {double(-sqrt(3))*d/2, -d/2, 2 }};
-    // std::vector<std::vector<double>> formationMap{{0, 0, 10},
-    //                                             {3.8620 ,1.0416,10},
-    //                                             {-3.4304, -2.0573,10},
-    //                                             {2.0469, 3.4366,10}}; // worst 
-    // std::vector<std::vector<double>> formationMap{{0, 0, 10},
-    //                                             {     -0.3401,    -0.3743,   7.0429},
-    //                                             {   -1.9794,   -2.0221 , 10.9967},
-    //                                             { 1.0366,     0.9942,  12.6338 }};  //best but target error sometimes
-    // std::vector<std::vector<double>> formationMap{{0, 0, 10},
-    //                                             { 1.5070,   -2.1943,  8.6165},
-    //                                             {  0.3882,   2.6335, 8.6165},
-    //                                             {  2.5952,   0.6014,   8.6205 }}; 
-     std::vector<std::vector<double>> tempMap = formationMap;
-
+                                                {1.11057e-08, 3.8913, 3.13971},
+                                                {-4.89413, -0.321373, 0.9717},
+                                                {3.39891, -2.07242, 3.02531}
+                                                };                             // lastest optimal
+    // std::vector<std::vector<double>> formationMap{{0, 0, 0},
+    //                                         { 2.5         ,0.         , 4.33012702},
+    //                                         { 1.76776695  ,3.06186218  ,3.53553391},
+    //                                         {-0.33493649  ,1.25        ,4.82962913}};  
+    // std::vector<std::vector<double>> formationMap{{0, 0, 0},
+    //                                         {  4.33654757 , 1.97100355 , 1.51970398},
+    //                                         {-2.02058568 , 1.00561994 , 4.4616098 },
+    //                                         { 1.45313501, -4.48373122 , 1.66869798}};  
     formation.setLaplacianMap(laplacianMap);
     formation.setFormationMap(formationMap);
 
@@ -221,7 +238,7 @@ int main(int argc, char **argv)
     Eigen::VectorXd final_vel;
     double yaw_vel;
     geometry_msgs::TwistStamped vel_msg;
-
+    std::vector<std::vector<double>> tempMap;
     double dt = 0.001;
 	double last_t = ros::Time::now().toSec();
 
@@ -241,35 +258,40 @@ int main(int argc, char **argv)
         // formation.setFormationMap(tempMap);
         for (int i=0;i<4;i++)
             cout <<"i = "<<i<< mavs[i].getPose() << "\n";
-            // cout << "i = " <<i<< tempMap[1][i]<<"\n\n";
         std:: cout <<"mode :  "<<cmd.mode_CMD() <<"\n";
-        if(cmd.mode_CMD() == 5)
-        {
-            if(true)
-            // if(target.estimating)
-            {
-                std::cout << "Vision tracking mode\n\n";
-                mavs[0].setPose(target.getPose());
-                mavs[0].setTwist(target.getTwist());
-            }
-            else
-            {
-                ROS_INFO("Target lost, unable to track");
-                cmd.vision_tracking = false;
-                geometry_msgs::Twist stop;
-                stop.linear.x = 0;
-                stop.linear.y = 0;
-                stop.linear.z = 0;
-                mavs[0].setTwist(stop);
-            }
+
+            // cout << "i = " <<i<< tempMap[1][i]<<"\n\n";
+        // if(cmd.mode_CMD() == 5)
+        // {
+        //     if(true)
+        //     // if(target.estimating)
+        //     {
+        //         t_time += 0.01;
+        //         for(int i=1; i < formationMap.size(); i++)
+        //         {
+        //             tempMap[i][0] = formationMap[i][0] *cos(t_time) + formationMap[i][1]*sin(t_time);
+        //             tempMap[i][1] = -formationMap[i][0] * sin(t_time) + formationMap[i][1] *cos(t_time);            
+        //         }
+        //         formation.setFormationMap(tempMap);
+        //     }
+        //     else
+        //     {
+        //         ROS_INFO("Target lost, unable to track");
+        //         cmd.vision_tracking = false;
+        //         geometry_msgs::Twist stop;
+        //         stop.linear.x = 0;
+        //         stop.linear.y = 0;
+        //         stop.linear.z = 0;
+        //         mavs[0].setTwist(stop);
+        //     }
                 
-        }
+        // }
         for(int i=0; i<mavNum; i++)
             Mavs_eigen[i] = mavMsg2Eigen(mavs[i]);
         formation.setCurr_Pose_Vel(Mavs_eigen);
         CBF.setMavsPosition(Mavs_eigen);
         formation_vel = formation.computeDesiredLVelocity(dt);
-        yaw_vel = formation.computeDesiredYawVelocity();
+        yaw_vel = formation.computeDesiredYawVelocity(cmd.mode_CMD());
         Eigen::Vector3d ang_vel = Eigen::Vector3d::Zero();
         ang_vel(2) = yaw_vel;
 
@@ -301,7 +323,7 @@ int main(int argc, char **argv)
             vel_msg.twist.angular.y = final_vel(4);
             vel_msg.twist.angular.z = final_vel(5);
         }
-
+        std::cout << vel_msg <<"\n";
         vel_cmd_pub.publish(vel_msg);
 
         dt = ros::Time::now().toSec() - last_t;

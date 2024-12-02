@@ -179,7 +179,7 @@ int main(int argc, char **argv)
         
         if(trajectory)
         {
-            trajectory_time += 0.005;
+            trajectory_time += 0.002;
             desired_pose.pose.position.x = current_x + 2*cos(trajectory_time);
             desired_pose.pose.position.y = current_y + 2*sin(trajectory_time);
             

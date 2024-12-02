@@ -23,7 +23,6 @@ private:
     double pitch;
     double yaw;
 
-    
 public:
     Formation(int mavNum);
     ~Formation();
@@ -31,7 +30,7 @@ public:
     void setFormationMap(std::vector<std::vector<double>> FM);
     void setCurr_Pose_Vel(std::vector<MAV_eigen> mavs_eigen);
     Eigen::Vector3d computeDesiredLVelocity(double dt);
-    double computeDesiredYawVelocity();
+    double computeDesiredYawVelocity(int);
 
     static int ID;
 };

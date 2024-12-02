@@ -69,21 +69,33 @@ Eigen::Vector3d Formation::computeDesiredLVelocity(double dt)
     desiredVel(2) += (Mavs_eigen[0].r(2) - Mavs_eigen[ID].r(2) + relative_Map[ID][0](2) );
 
     virtualAcc += 5*(Mavs_eigen[0].v );
-    // desiredVel(0) += Mavs_eigen[0].v(0);
-    // desiredVel(1) += Mavs_eigen[0].v(1);
+    desiredVel(0) += Mavs_eigen[0].v(0);
+    desiredVel(1) += Mavs_eigen[0].v(1);
     
     return desiredVel;
 }
 
-double Formation::computeDesiredYawVelocity()
+double Formation::computeDesiredYawVelocity(int cmd)
 {   
-    desired_yaw = atan2(Mavs_eigen[0].r(1) - Mavs_eigen[ID].r(1), Mavs_eigen[0].r(0) - Mavs_eigen[ID].r(0));
+    if (cmd == 5)
+    {
 
-    // desired_yaw =  2.1718;//atan2(Mavs_eigen[0].r(1) - Mavs_eigen[ID].r(1), Mavs_eigen[0].r(0) - Mavs_eigen[ID].r(0));
-    // if (ID == 1)
-    //     desired_yaw =    -0.9690;
-    // if (ID == 2)
-    //     desired_yaw =     0.7868;   
+        switch(ID)
+        {
+            case 1 :
+                desired_yaw = 1.57383687;
+                break;
+            case 2 :
+                desired_yaw = 3.65985165;
+                break;
+            case 3 : 
+                desired_yaw = 2.6171138;
+                break;
+        }
+        desired_yaw = 0;
+    }
+    else
+        desired_yaw = atan2(Mavs_eigen[0].r(1) - Mavs_eigen[ID].r(1), Mavs_eigen[0].r(0) - Mavs_eigen[ID].r(0));
     double error_yaw = desired_yaw - yaw;
     if(error_yaw>M_PI)
         error_yaw = error_yaw - 2*M_PI;

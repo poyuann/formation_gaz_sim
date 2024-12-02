@@ -125,14 +125,11 @@ int main(int argc, char **argv)
 					}
 					break;
 				case 53:    // (5) tracking trigger
-					if(!tracking)
-						ROS_INFO("Not in tracking mode");
-					else
-					{
+
 						mode_cmd.data = 5;
 						mode_cmd_pub.publish(mode_cmd);
 						ROS_INFO("Vision tracking switch");
-					}
+					
 					break;
 
 				case 105:	// (i) uav_init
