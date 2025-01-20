@@ -173,6 +173,10 @@ int main(int argc, char **argv)
                                                 {1, 1, 1, 1},
                                                 {1, 1, 1, 1},
                                                 {1, 1, 1, 1}};
+    std::vector<std::vector<double>> formationMap{{0, 0, 0},
+                                                {0, d, 2},
+                                                {double(sqrt(3))*d/2, -d/2, 2},
+                                                {double(-sqrt(3))*d/2, -d/2, 2}};
     // std::vector<std::vector<double>> formationMap{{0, 0, 10},
     //                                             { 1.3580,    -1.2072,  13.5635},
     //                                             { -0.7669, 1.7305 , 13.5238},
@@ -201,11 +205,11 @@ int main(int argc, char **argv)
     //                                         {3.21168, -2.32042, 3.04971}, 
     //                                         {-0.435081, 4.87361, 1.0289}
     //                                         };                             // test optimal
-    std::vector<std::vector<double>> formationMap{{0, 0, 0},
-                                                {1.11057e-08, 3.8913, 3.13971},
-                                                {-4.89413, -0.321373, 0.9717},
-                                                {3.39891, -2.07242, 3.02531}
-                                                };                             // lastest optimal
+    // std::vector<std::vector<double>> formationMap{{0, 0, 0},
+    //                                             {1.11057e-08, 3.8913, 3.13971},
+    //                                             {-4.89413, -0.321373, 0.9717},
+    //                                             {3.39891, -2.07242, 3.02531}
+    //                                             };                             // lastest optimal
     // std::vector<std::vector<double>> formationMap{{0, 0, 0},
     //                                         { 2.5         ,0.         , 4.33012702},
     //                                         { 1.76776695  ,3.06186218  ,3.53553391},
